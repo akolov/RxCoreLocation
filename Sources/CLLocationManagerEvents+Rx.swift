@@ -42,6 +42,7 @@ extension Reactive where Base: CLLocationManager {
             .unwrap()
     }
     /// Reactive Observable for `showsBackgroundLocationIndicator`
+    @available(macOS, unavailable)
     public var showsBackgroundLocationIndicator: Observable<Bool> {
         return self.observe(Bool.self, .showsBackgroundLocationIndicator)
             .map { $0 }
@@ -120,8 +121,18 @@ extension Reactive where Base: CLLocationManager {
             .unwrap()
     }
     /// Reactive Observable for `rangedRegions`
-    public var rangedRegions: Observable<Set<CLRegion>> {
-        return self.observe(Set<CLRegion>.self, .rangedRegions)
+    @available(iOS, deprecated: 14.0)
+    @available(macOS, deprecated: 10.15)
+    public var rangedRegions: Observable<Set<CLLocation>> {
+        return self.observe(Set<CLLocation>.self, .rangedRegions)
+          .map { $0 }
+          .unwrap()
+    }
+
+    /// Reactive Observable for `rangedBeaconConstraints`
+    @available(macOS 10.15, iOS 13.0, *)
+    public var rangedBeaconConstraints: Observable<Set<CLBeaconIdentityConstraint>> {
+        return self.observe(Set<CLBeaconIdentityConstraint>.self, .rangedBeaconConstraints)
             .map { $0 }
             .unwrap()
     }
@@ -138,6 +149,8 @@ extension Reactive where Base: CLLocationManager {
     
      #if os(iOS) || os(macOS)
     /// Reactive Observable fo `deferredLocationUpdatesAvailable`
+    @available(iOS, deprecated: 14.0)
+    @available(macOS, deprecated: 10.15)
     public var isDeferred: Observable<Bool> {
         return CLLocationManager.__isDeferred.share()
     }
@@ -180,7 +193,9 @@ extension CLLocationManager {
         }
     }
     /// Reactive Observable fo `deferredLocationUpdatesAvailable`
-     #if os(iOS) || os(macOS)
+    #if os(iOS) || os(macOS)
+    @available(iOS, deprecated: 14.0)
+    @available(macOS, deprecated: 10.15)
     internal static var __isDeferred: Observable<Bool> {
         return Observable.create { observer in
             observer.on(.next(CLLocationManager.deferredLocationUpdatesAvailable()))
